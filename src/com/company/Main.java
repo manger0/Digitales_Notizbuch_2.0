@@ -13,6 +13,7 @@ public class Main {
         boolean read = true;
         boolean write;
         System.out.println("digital notebook 2.0");
+
         do {
             // Task 2, write new note or x for note, checking user input
             Scanner userInput = new Scanner(System.in);
@@ -58,13 +59,16 @@ public class Main {
 
     // Methods
     public static void writeInDB(Connection connection, String note) {
-        try (Statement statementWrite = connection.createStatement()) {
+        final String SQL_INSERT = "INSERT INTO notes (note_text, note_date)" +
+                "Values (?,?)";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(SQL_INSERT)) {
             Date date = new Date();
             SimpleDateFormat ft = new SimpleDateFormat("yyyy.MM.dd");
-            statementWrite.executeUpdate("INSERT INTO notes (note_text, note_date)" +
-                    "Values ('" + note + "', '" + ft.format(date) + "')");
-        } catch (SQLException e) {
-            throw new Error("Problem", e);
+            preparedStatement.setString(1,note);
+            preparedStatement.setString(2,  ft.format(date));
+            preparedStatement.executeUpdate();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
     }
 
